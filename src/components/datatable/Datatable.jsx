@@ -55,29 +55,28 @@ const Datatable = ({ listName, listPath, columns, userRows, setUserRows }) => {
         const data = utils.sheet_to_json(worksheet); // generate objects
         // const formatDate = new Intl.DateTimeFormat("pt-br", { dateStyle: 'short'})
         const dt = []
-        const fetch = () => {
-            api.get("employees").then((response) => setUserRows(response.data))
-        }
-        data.forEach(async (d)=> {
-            const employee = {};
-            
-            // for (const property in object) {
-            //     console.log(`${property}: ${object[property]}`);
-            //   }
-            const departments = await api.get("departments")
-            const positions = await api.get("positions")
-            Object.entries(keyToPropMap).forEach(([key, prop]) => {
-              if (d[key] !== undefined) {
-                if(prop === "birth_date" || prop === "start_date")
-                    employee[prop] = new Date(Date.UTC(0, 0, d[key] - 1))  
-                else
-                    employee[prop] = d[key];           
-              }
-            });
-
-
-            const findDepartment = departments.data.find(dep => dep.name === employee.department_id)
-            setTimeout(async () => {
+        setTimeout(() => {
+            const fetch = () => {
+                api.get("employees").then((response) => setUserRows(response.data))
+            }
+            data.forEach(async (d)=> {
+                const employee = {};
+                
+                // for (const property in object) {
+                //     console.log(`${property}: ${object[property]}`);
+                //   }
+                const departments = await api.get("departments")
+                const positions = await api.get("positions")
+                Object.entries(keyToPropMap).forEach(([key, prop]) => {
+                  if (d[key] !== undefined) {
+                    if(prop === "birth_date" || prop === "start_date")
+                        employee[prop] = new Date(Date.UTC(0, 0, d[key] - 1))  
+                    else
+                        employee[prop] = d[key];           
+                  }
+                });
+    
+                const findDepartment = departments.data.find(dep => dep.name === employee.department_id)
                 if (findDepartment){
                     employee.department_id = findDepartment.id
                 } else  {
@@ -88,31 +87,31 @@ const Datatable = ({ listName, listPath, columns, userRows, setUserRows }) => {
                         if (department.name === employee.department_id)
                             employee.department_id = department.id
                     })
+    
                 }
-            }, 10000)
-            
-            const findPosition = positions.data.find(pos => pos.name === employee.position_id)
-            setTimeout(async () => {
-            if (findPosition){
-                employee.position_id = findPosition.id
-            } else {
-                api.post('positions', {name: employee.position_id}).then(() => {})
-                const positions = await api.get("positions")
-                if (positions.data) 
-                positions.data.forEach(position => {
-                    if (position.name === employee.position_id)
-                        employee.position_id = position.id
-                })
-            }
-            }, 10000)
-
-            setTimeout(() => {
+    
+                 const findPosition = positions.data.find(pos => pos.name === employee.position_id)
+                if (findPosition){
+                    employee.position_id = findPosition.id
+                } else {
+                    api.post('positions', {name: employee.position_id}).then(() => {})
+                    const positions = await api.get("positions")
+                    if (positions.data) 
+                    positions.data.forEach(position => {
+                        if (position.name === employee.position_id)
+                            employee.position_id = position.id
+                    })
+    
+                }
+    
                 api.post("employees", employee)
-                .then(() => fetch())
-                .catch(error => console.error(error));
-            }, 10000)
-
-          });
+                  .then(() => fetch())
+                  .catch(error => console.error(error));
+    
+              });
+                
+        }, 10000)
+        
         // api.get("employees").then((response) => setUserRows(response.data))
         // console.log(data)
         // api.post("employees", data)
