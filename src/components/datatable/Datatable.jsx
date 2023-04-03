@@ -59,68 +59,57 @@ const Datatable = ({ listName, listPath, columns, userRows, setUserRows }) => {
             api.get("employees").then((response) => setUserRows(response.data))
         }
         data.forEach(async (d)=> {
-            const employee = {};
+            setTimeout(async () => {
+                const employee = {};
             
-            // for (const property in object) {
-            //     console.log(`${property}: ${object[property]}`);
-            //   }
-            const departments = await api.get("departments")
-            const positions = await api.get("positions")
-            Object.entries(keyToPropMap).forEach(([key, prop]) => {
-              if (d[key] !== undefined) {
-                if(prop === "birth_date" || prop === "start_date")
-                    employee[prop] = new Date(Date.UTC(0, 0, d[key] - 1))  
-                else
-                    employee[prop] = d[key];           
-              }
-            });
-
-            const findDepartment = departments.data.find(dep => dep.name === employee.department_id)
-            if (findDepartment){
-                employee.department_id = findDepartment.id
-            } else  {
-                api.post('departments', {name: employee.department_id}).then(() => {})
+                // for (const property in object) {
+                //     console.log(`${property}: ${object[property]}`);
+                //   }
                 const departments = await api.get("departments")
-                if (departments.data)
-                departments.data.map(department => {
-                    if (department.name === employee.department_id)
-                        employee.department_id = department.id
-                })
-
-            }
-
-
-             const findPosition = positions.data.find(pos => pos.name === employee.position_id)
-            if (findPosition){
-                employee.position_id = findPosition.id
-            } else {
-                api.post('positions', {name: employee.position_id}).then(() => {})
                 const positions = await api.get("positions")
-                if (positions.data) 
-                positions.data.forEach(position => {
-                    if (position.name === employee.position_id)
-                        employee.position_id = position.id
-                })
+                Object.entries(keyToPropMap).forEach(([key, prop]) => {
+                  if (d[key] !== undefined) {
+                    if(prop === "birth_date" || prop === "start_date")
+                        employee[prop] = new Date(Date.UTC(0, 0, d[key] - 1))  
+                    else
+                        employee[prop] = d[key];           
+                  }
+                });
+    
+                const findDepartment = departments.data.find(dep => dep.name === employee.department_id)
+                if (findDepartment){
+                    employee.department_id = findDepartment.id
+                } else  {
+                    api.post('departments', {name: employee.department_id}).then(() => {})
+                    const departments = await api.get("departments")
+                    if (departments.data)
+                    departments.data.map(department => {
+                        if (department.name === employee.department_id)
+                            employee.department_id = department.id
+                    })
+    
+                }
+    
+                 const findPosition = positions.data.find(pos => pos.name === employee.position_id)
+                if (findPosition){
+                    employee.position_id = findPosition.id
+                } else {
+                    api.post('positions', {name: employee.position_id}).then(() => {})
+                    const positions = await api.get("positions")
+                    if (positions.data) 
+                    positions.data.forEach(position => {
+                        if (position.name === employee.position_id)
+                            employee.position_id = position.id
+                    })
+    
+                }
+    
+                api.post("employees", employee)
+                  .then(() => fetch())
+                  .catch(error => console.error(error));
+            }, 10000)
+           
 
-            }
-
-            
-
-            
-            
-
-            
-                
-
-
-
-            //   employee.position_id = "eb66f3cd-4a4a-4fb8-b895-04705d43fa52";
-            
-            //   employee.department_id = "a89af668-a809-4d3b-9b87-7b5f3e304bd0";
-            // console.log(employee)
-            api.post("employees", employee)
-              .then(() => fetch())
-              .catch(error => console.error(error));
           });
         // api.get("employees").then((response) => setUserRows(response.data))
         // console.log(data)
