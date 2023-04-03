@@ -75,21 +75,24 @@ const Datatable = ({ listName, listPath, columns, userRows, setUserRows }) => {
               }
             });
 
+
             const findDepartment = departments.data.find(dep => dep.name === employee.department_id)
-            if (findDepartment){
-                employee.department_id = findDepartment.id
-            } else  {
-                api.post('departments', {name: employee.department_id}).then(() => {})
-                const departments = await api.get("departments")
-                if (departments.data)
-                departments.data.map(department => {
-                    if (department.name === employee.department_id)
-                        employee.department_id = department.id
-                })
-
-            }
-
-             const findPosition = positions.data.find(pos => pos.name === employee.position_id)
+            setTimeout(async () => {
+                if (findDepartment){
+                    employee.department_id = findDepartment.id
+                } else  {
+                    api.post('departments', {name: employee.department_id}).then(() => {})
+                    const departments = await api.get("departments")
+                    if (departments.data)
+                    departments.data.map(department => {
+                        if (department.name === employee.department_id)
+                            employee.department_id = department.id
+                    })
+                }
+            }, 10000)
+            
+            const findPosition = positions.data.find(pos => pos.name === employee.position_id)
+            setTimeout(async () => {
             if (findPosition){
                 employee.position_id = findPosition.id
             } else {
@@ -100,14 +103,14 @@ const Datatable = ({ listName, listPath, columns, userRows, setUserRows }) => {
                     if (position.name === employee.position_id)
                         employee.position_id = position.id
                 })
-
             }
+            }, 10000)
 
             setTimeout(() => {
                 api.post("employees", employee)
                 .then(() => fetch())
                 .catch(error => console.error(error));
-            }, 15000)
+            }, 10000)
 
           });
         // api.get("employees").then((response) => setUserRows(response.data))
