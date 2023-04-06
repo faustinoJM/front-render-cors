@@ -30,6 +30,7 @@ const payrollColumns = [
 ]
 
 export const outputColumnVisible= {
+    employee_id: false,
     total_overtime: true,
     total_absences: true,
     cash_advances: true,

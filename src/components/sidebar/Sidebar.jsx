@@ -25,7 +25,12 @@ async function fetchSettings(){
     return data
 }
 
+function addToken() {
+    api.defaults.headers['Authorization'] = !!localStorage.getItem('@ConsulPayroll:refresh_token') ? `Bearer ${localStorage.getItem('@ConsulPayroll:refresh_token')}` : '';
+  }
+
 const Sidebar = (d, f) => {
+    addToken()
     const { signOut } = useAuth();
     const [setting, setSetting] = useState(null)
     const [companyName, setCompanyName] = useState("")

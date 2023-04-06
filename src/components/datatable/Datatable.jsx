@@ -54,63 +54,213 @@ const Datatable = ({ listName, listPath, columns, userRows, setUserRows }) => {
         // const worksheet = workbook.Sheets[workbook.SheetNames[0]]; // get the first worksheet
         const data = utils.sheet_to_json(worksheet); // generate objects
         // const formatDate = new Intl.DateTimeFormat("pt-br", { dateStyle: 'short'})
-        const dt = []
-        setTimeout(() => {
-            const fetch = () => {
-                api.get("employees").then((response) => setUserRows(response.data))
-            }
-            data.forEach(async (d)=> {
-                const employee = {};
+        const fetch = () => {
+            api.get("employees").then((response) => setUserRows(response.data))
+        }
+        console.log("111")
+        api.post("payrolls/excel/import", data)
+        const timer = ms => new Promise(res => setTimeout(res, ms))
+
+        // data.forEach(async (d)=> {
+        //     const employee = {};
+            
+        //     // for (const property in object) {
+        //     //     console.log(`${property}: ${object[property]}`);
+        //     //   }
+        //     Object.entries(keyToPropMap).forEach(([key, prop]) => {
+        //       if (d[key] !== undefined) {
+        //         if(prop === "birth_date" || prop === "start_date")
+        //             employee[prop] = new Date(Date.UTC(0, 0, d[key] - 1))  
+        //         else
+        //             employee[prop] = d[key];           
+        //       }
+        //     });
+
+        //     api.post('positions', {name: employee.position_id}).then(() => {})
+        //     api.post('departments', {name: employee.department_id}).then(() => {})
+        //     const departments = await api.get("departments")
+        //     const positions = await api.get("positions")
+
+        //     if (departments.data)
+        //         departments.data.map(department => {
+        //             if (department.name === employee.department_id)
+        //                 employee.department_id = department.id
+        //         })
+            
+
+        //     if (positions.data) 
+        //         positions.data.forEach(position => {
+        //             if (position.name === employee.position_id)
+        //                 employee.position_id = position.id
+        //         })
                 
-                // for (const property in object) {
-                //     console.log(`${property}: ${object[property]}`);
-                //   }
-                const departments = await api.get("departments")
-                const positions = await api.get("positions")
-                Object.entries(keyToPropMap).forEach(([key, prop]) => {
-                  if (d[key] !== undefined) {
-                    if(prop === "birth_date" || prop === "start_date")
-                        employee[prop] = new Date(Date.UTC(0, 0, d[key] - 1))  
-                    else
-                        employee[prop] = d[key];           
-                  }
-                });
-    
-                const findDepartment = departments.data.find(dep => dep.name === employee.department_id)
-                if (findDepartment){
-                    employee.department_id = findDepartment.id
-                } else  {
-                    api.post('departments', {name: employee.department_id}).then(() => {})
-                    const departments = await api.get("departments")
-                    if (departments.data)
-                    departments.data.map(department => {
-                        if (department.name === employee.department_id)
-                            employee.department_id = department.id
-                    })
-    
-                }
-    
-                 const findPosition = positions.data.find(pos => pos.name === employee.position_id)
-                if (findPosition){
-                    employee.position_id = findPosition.id
-                } else {
-                    api.post('positions', {name: employee.position_id}).then(() => {})
-                    const positions = await api.get("positions")
-                    if (positions.data) 
-                    positions.data.forEach(position => {
-                        if (position.name === employee.position_id)
-                            employee.position_id = position.id
-                    })
-    
-                }
-    
-                api.post("employees", employee)
-                  .then(() => fetch())
-                  .catch(error => console.error(error));
-    
-              });
+
+
+
+        //     //   employee.position_id = "eb66f3cd-4a4a-4fb8-b895-04705d43fa52";
+            
+        //     //   employee.department_id = "a89af668-a809-4d3b-9b87-7b5f3e304bd0";
+        //     // console.log(employee)
+        //     api.post("employees", employee)
+        //       .then(() => fetch())
+        //       .catch(error => console.error(error));
+        //   });
+
+        // async function load () { // We need to wrap the loop into an async function for this to work
+        // for (var i = 0; i < data.length; i++) {
+        //         const employee = {};
+            
+            
+        //     const departments = await api.get("departments")
+        //     const positions = await api.get("positions")
+        //     Object.entries(keyToPropMap).forEach(([key, prop]) => {
+        //         if (data[i][key] !== undefined) {
+        //         if(prop === "birth_date" || prop === "start_date")
+        //             employee[prop] = new Date(Date.UTC(0, 0, data[i][key] - 1))  
+        //         else
+        //             employee[prop] = data[i][key];           
+        //         }
+        //     });
+
+        //     const findDepartment = departments.data.find(dep => dep.name === employee.department_id)
+        //     if (findDepartment){
+        //         employee.department_id = findDepartment.id
+        //     } else  {
+        //         api.post('departments', {name: employee.department_id}).then(() => {})
+        //         const departments = await api.get("departments")
+        //         if (departments.data)
+        //         departments.data.map(department => {
+        //             if (department.name === employee.department_id)
+        //                 employee.department_id = department.id
+        //         })
+
+        //     }
+
+        //         const findPosition = positions.data.find(pos => pos.name === employee.position_id)
+        //     if (findPosition){
+        //         employee.position_id = findPosition.id
+        //     } else {
+        //         api.post('positions', {name: employee.position_id}).then(() => {})
+        //         const positions = await api.get("positions")
+        //         if (positions.data) 
+        //         positions.data.forEach(position => {
+        //             if (position.name === employee.position_id)
+        //                 employee.position_id = position.id
+        //         })
+
+        //     }
+
+        //     api.post("employees", employee)
+        //         .then(() => fetch())
+        //         .catch(error => console.error(error));
+        //     await timer(5000); // then the created Promise can be awaited
+        //     }
+        // }
+        // load();
+        // for (let i = 0; i < data.length; i++) {
+        //     setTimeout(async () => {
                 
-        }, 10000)
+        //         const employee = {};
+            
+        //         // for (const property in object) {
+        //         //     console.log(`${property}: ${object[property]}`);
+        //         //   }
+        //         Object.entries(keyToPropMap).forEach(([key, prop]) => {
+        //           if (data[i][key] !== undefined) {
+        //             if(prop === "birth_date" || prop === "start_date")
+        //                 employee[prop] = new Date(Date.UTC(0, 0, data[i][key] - 1))  
+        //             else
+        //                 employee[prop] = data[i][key];           
+        //           }
+        //         });
+    
+        //         api.post('positions', {name: employee.position_id}).then(() => {})
+        //         api.post('departments', {name: employee.department_id}).then(() => {})
+        //         const departments = await api.get("departments")
+        //         const positions = await api.get("positions")
+    
+        //         if (departments.data)
+        //             departments.data.map(department => {
+        //                 if (department.name === employee.department_id)
+        //                     employee.department_id = department.id
+        //             })
+                
+    
+        //         if (positions.data) 
+        //             positions.data.forEach(position => {
+        //                 if (position.name === employee.position_id)
+        //                     employee.position_id = position.id
+        //             })
+                    
+    
+    
+    
+        //         //   employee.position_id = "eb66f3cd-4a4a-4fb8-b895-04705d43fa52";
+                
+        //         //   employee.department_id = "a89af668-a809-4d3b-9b87-7b5f3e304bd0";
+        //         // console.log(employee)
+        //         api.post("employees", employee)
+        //           .then(() => fetch())
+        //           .catch(error => console.error(error));
+         
+
+        //     }, i * 1);
+        //     }
+        // data.forEach(async (d)=> {
+            
+            
+
+
+        //     // const employee = {};
+            
+        //     // // for (const property in object) {
+        //     // //     console.log(`${property}: ${object[property]}`);
+        //     // //   }
+        //     // const departments = await api.get("departments")
+        //     // const positions = await api.get("positions")
+        //     // Object.entries(keyToPropMap).forEach(([key, prop]) => {
+        //     //     if (d[key] !== undefined) {
+        //     //     if(prop === "birth_date" || prop === "start_date")
+        //     //         employee[prop] = new Date(Date.UTC(0, 0, d[key] - 1))  
+        //     //     else
+        //     //         employee[prop] = d[key];           
+        //     //     }
+        //     // });
+
+        //     // const findDepartment = departments.data.find(dep => dep.name === employee.department_id)
+        //     // if (findDepartment){
+        //     //     employee.department_id = findDepartment.id
+        //     // } else  {
+        //     //     api.post('departments', {name: employee.department_id}).then(() => {})
+        //     //     const departments = await api.get("departments")
+        //     //     if (departments.data)
+        //     //     departments.data.map(department => {
+        //     //         if (department.name === employee.department_id)
+        //     //             employee.department_id = department.id
+        //     //     })
+
+        //     // }
+
+        //     //     const findPosition = positions.data.find(pos => pos.name === employee.position_id)
+        //     // if (findPosition){
+        //     //     employee.position_id = findPosition.id
+        //     // } else {
+        //     //     api.post('positions', {name: employee.position_id}).then(() => {})
+        //     //     const positions = await api.get("positions")
+        //     //     if (positions.data) 
+        //     //     positions.data.forEach(position => {
+        //     //         if (position.name === employee.position_id)
+        //     //             employee.position_id = position.id
+        //     //     })
+
+        //     // }
+
+        //     // api.post("employees", employee)
+        //     //     .then(() => fetch())
+        //     //     .catch(error => console.error(error));
+
+        //     });
+            
         
         // api.get("employees").then((response) => setUserRows(response.data))
         // console.log(data)
@@ -284,13 +434,14 @@ useEffect(() => {
                 initialState={{
                     pinnedColumns: { left: ['id', 'name'] },
                     sorting: {
-                        sortModel: [{ field: 'employee_id', sort: 'asc' }],
+                        sortModel: [{ field: 'name', sort: 'asc' }],
                       },
                       columns: {
                         columnVisibilityModel: {
                             id: false,
+                            employee_id: false
                           // Hide columns status and traderName, the other columns will remain visible
-                          dependents: visible ? true : false,
+                        //   dependents: visible ? true : false,
                         //   action: false
                         },
                       },

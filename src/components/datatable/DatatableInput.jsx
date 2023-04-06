@@ -188,7 +188,7 @@ const DatatableInput = ({ listName, listPath, columns, userRows, setUserRows, se
                 //     height: '260px !important',
                 //     overflowY: 'auto',
                 //   },
-                  '& .MuiDataGrid-cell:nth-child(2)': {
+                  '& .MuiDataGrid-cell:nth-child(1)': {
                     position:"sticky",
                     left:"0",
                     zIndex:"1",
@@ -197,9 +197,9 @@ const DatatableInput = ({ listName, listPath, columns, userRows, setUserRows, se
                     borderRight: "1px solid black"
                   },
 
-                  '& .MuiDataGrid-cell:nth-child(1)': {                    
-                    borderLeft: "0.2px solid black",
-                  },
+                //   '& .MuiDataGrid-cell:nth-child(1)': {                    
+                //     borderLeft: "0.2px solid black",
+                //   },
                 // "& .MuiDataGrid-row": {
                 // //   borderTop: 1,
                 // //   borderBottom: 0,
@@ -228,7 +228,7 @@ const DatatableInput = ({ listName, listPath, columns, userRows, setUserRows, se
                 initialState={{
                     pinnedColumns: { left: ['id', 'name'] },
                     sorting: {
-                        sortModel: [{ field: 'employee_id', sort: 'asc' }],
+                        sortModel: [{ field: 'employee_name', sort: 'asc' }],
                       },
                     // columns: {
                     //     columnVisibilityModel: {
@@ -253,7 +253,7 @@ export default DatatableInput;
 
 
 const payrollInputColumns = [
-    { field: 'employee_id', headerName: 'ID', width: 70, align:'center', headerAlign: 'center',},
+    { field: 'employee_id', headerName: 'ID', width: 70, align:'center', headerAlign: 'center', hide: true},
     { field: 'employee_name', headerName: 'Nome', width: 200,align:'left', headerAlign: 'center',},
     // { field: "dependents", headerName:"Dependentes", width: 120,  align:'center', headerAlign: 'center', },
     { field: "departament_name", headerName:"Departemento", width: 180,  align:'left', headerAlign: 'center', },

@@ -426,7 +426,7 @@ const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, 
                 //     height: '260px !important',
                 //     overflowY: 'auto',
                 //   },
-                  '& .MuiDataGrid-cell:nth-child(2)': {
+                  '& .MuiDataGrid-cell:nth-child(1)': {
                     position:"sticky",
                     left:"0",
                     zIndex:"1",
@@ -465,7 +465,7 @@ const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, 
                 initialState={{
                     pinnedColumns: { left: ['id', 'name'] },
                     sorting: {
-                        sortModel: [{ field: 'employee_id', sort: 'asc' }],
+                        sortModel: [{ field: 'employee_name', sort: 'asc' }],
                       },
                     // columns: {
                     //     columnVisibilityModel: {

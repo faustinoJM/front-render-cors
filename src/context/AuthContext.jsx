@@ -42,7 +42,9 @@ export function AuthProvider({ children }) {
       email,
       password
     })
-
+    api.defaults.headers = {
+      Authorization: 'Bearer ' + "Ziniznoas"
+    }
     let rota = "https://outrageous-slug-windbreaker.cyclic.app"
 
     // if (response.status === 200) {

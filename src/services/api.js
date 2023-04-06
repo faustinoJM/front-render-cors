@@ -4,7 +4,7 @@ import { url } from "../context/AuthContext";
 
 // console.log(url)
 const api = axios.create({
-  baseURL: "https://outrageous-slug-windbreaker.cyclic.app" //"http://localhost:3333"
+  baseURL: "http://localhost:3333"  //"https://outrageous-slug-windbreaker.cyclic.app"
 })
 
 export let api2 = axios.create({

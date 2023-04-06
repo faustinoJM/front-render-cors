@@ -8,9 +8,21 @@ import Chart from "../../components/chart/Chart";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 
+
+
+// function addToken() {
+//     api.defaults.headers['Authorization'] = !!localStorage.getItem('@ConsulPayroll:refresh_token') ? `Bearer ${localStorage.getItem('@ConsulPayroll:refresh_token')}` : '';
+//   }
+// api.interceptors.request.use(req => {
+//     // `req` is the Axios request config, so you can modify
+//     // the `headers`.
+//     req.headers.authorization = 'Bearer my secret token';
+//     return req;
+//   });
+
 const Home = () => {
     // const local = localStorage.getItem('@ConsulPayroll:api')
-
+    // addToken()
     const [employee, setEmployee] = useState(null);
     const [position, setPosition] = useState(null);
     const [department, setDepartment] = useState(null);
