@@ -1,20 +1,13 @@
-import "./datatablePayroll.scss";
-import { DataGrid, GridToolbar} from '@mui/x-data-grid';
-// import { userColumns, userRows } from "../../datatablesource";
+import "./datatableOutputPayroll.scss";
+import { DataGrid,} from '@mui/x-data-grid';
 import { Link } from "react-router-dom"
 import { useCallback, useEffect, useRef, useState } from "react";
 import api from "../../services/api";
-import { useDemoData } from '@mui/x-data-grid-generator';
 import { useReactToPrint } from "react-to-print";
-import { mock } from "../../assets/mockData";
-import { PrintButton } from "../printButton/PrintButton";
-import { read, utils, writeFileXLSX } from 'xlsx';
-import LinearProgress from '@mui/material/LinearProgress';
 import PrintPayslip from "../printPayslip/PrintPayslip";
 import exceljs from 'exceljs';
 import { saveAs } from 'file-saver';
 import PrintIcon from '@mui/icons-material/Print';
-import { set } from "react-hook-form";
 
 const formatSalary = () => {
     return new Intl.NumberFormat("en-US",{maximumFractionDigits: 2, minimumFractionDigits: 2})
@@ -23,7 +16,7 @@ const formatDate = new Intl.DateTimeFormat("pt-br", { dateStyle: 'short'})
 
 const payrollDate = formatDate.format(new Date())
 
-const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, settings, outputColumnVisible }) => {
+const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUserRows, settings, outputColumnVisible }) => {
     const workbook = new exceljs.Workbook();
     const [maumau, setmaumau] = useState([])
     const [data2, setData2] = useState(userRows);
@@ -64,7 +57,7 @@ const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, 
             let years = 0;
             const yearsArray = []
             const response = await api.get("payrolls")
-            console.log(response.data)
+            console.log("128",response.data)
             // setmaumau(response.data)
 
             response.data.map(data => {
@@ -108,8 +101,51 @@ const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, 
         setYear(e)
         let ddd = data2.filter(row => (row.year === +e) && (row.month === month) )
         setLoading(true)
+        let filteredRows = data2.filter(row => (row.year === +e) && (row.month === month) )
+        let totalLiquid = 0
+            let totalBase = 0
+            let totalIrps = 0
+            let totalGross = 0
+            let totalInss = 0
+            let totalInssCompany = 0
+            let totalInssEmployee = 0
+            let totalLength = 0
+
+            totalLength = filteredRows.map((data, index) => {
+                totalLiquid += (+data.salary_liquid)
+                totalBase += (+data.salary_base)
+                totalGross += (+data.total_income)
+                totalIrps += (+data.irps)
+                totalInss += (+data.inss_company) + (+data.inss_employee)
+                totalInssCompany += (+data.inss_company)
+                totalInssEmployee += (+data.inss_employee)
+             })
+
+             const totalRow = [
+              {
+              id: "totalId",
+              employee_id: totalLength.length + 1,
+              employee_name: "Total",
+              departament_name: "", 
+              position_name: "", 
+              salary_base: formatSalary().format(totalBase), 
+              subsidy: "", 
+              bonus: "", 
+              total_overtime: "", 
+              total_absences: "", 
+              cash_advances: "", 
+              backpay: "", 
+              total_income: formatSalary().format(totalGross), 
+              irps: formatSalary().format(totalIrps), 
+              inss_employee: formatSalary().format(totalInssEmployee), 
+              salary_liquid: formatSalary().format(totalLiquid), 
+              inss_company: formatSalary().format(totalInssCompany), 
+              total_inss: formatSalary().format(totalInss), 
+          }
+      ]
+
         // setExcelPayroll(ddd)
-        data2.map((data) => {
+        filteredRows.map((data) => {
             data.salary_base = formatSalary().format(data.salary_base)
             data.salary_liquid = formatSalary().format(data.salary_liquid)
             data.total_income = formatSalary().format(data.total_income)
@@ -125,7 +161,7 @@ const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, 
             data.total_inss = formatSalary().format(data.total_inss)
         })
         console.log(data3.filter(row => (row.year === "2023")))
-        setUserRows(data2.filter(row => (row.year === +e) && (row.month === month) ))
+        setUserRows(filteredRows.concat(totalRow))
         // setLoading(false)
         // setUserRows(data2.filter(row => ((row.year === +e) && (row.month === month)) || (row.year === +e)))
         // console.log(data.filter(row => row.year === +e))
@@ -139,8 +175,51 @@ const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, 
         // let ddd = maumau.filter(row => (row.month === e))
         // console.log(ddd)
         // setExcelPayroll(ddd)
+        let filteredRows = data2.filter(row => (row.month === e) && (row.year === +year) )
+        let totalLiquid = 0
+            let totalBase = 0
+            let totalIrps = 0
+            let totalGross = 0
+            let totalInss = 0
+            let totalInssCompany = 0
+            let totalInssEmployee = 0
+            let totalLength = 0
 
-        data2.map((data) => {
+            totalLength = filteredRows.map((data, index) => {
+                totalLiquid += (+data.salary_liquid)
+                totalBase += (+data.salary_base)
+                totalGross += (+data.total_income)
+                totalIrps += (+data.irps)
+                totalInss += (+data.inss_company) + (+data.inss_employee)
+                totalInssCompany += (+data.inss_company)
+                totalInssEmployee += (+data.inss_employee)
+             })
+
+             const totalRow = [
+              {
+              id: "totalId",
+              employee_id: totalLength.length + 1,
+              employee_name: "Total",
+              departament_name: "", 
+              position_name: "", 
+              salary_base: formatSalary().format(totalBase), 
+              subsidy: "", 
+              bonus: "", 
+              total_overtime: "", 
+              total_absences: "", 
+              cash_advances: "", 
+              backpay: "", 
+              total_income: formatSalary().format(totalGross), 
+              irps: formatSalary().format(totalIrps), 
+              inss_employee: formatSalary().format(totalInssEmployee), 
+              salary_liquid: formatSalary().format(totalLiquid), 
+              inss_company: formatSalary().format(totalInssCompany), 
+              total_inss: formatSalary().format(totalInss), 
+          }
+      ]
+
+      filteredRows.map((data, index) => {
+            data.employee_id = index + 1
             data.salary_base = formatSalary().format(data.salary_base)
             data.salary_liquid = formatSalary().format(data.salary_liquid)
             data.total_income = formatSalary().format(data.total_income)
@@ -156,7 +235,7 @@ const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, 
             data.total_inss = formatSalary().format(data.total_inss)
         })
         let kkk = data2.filter(row => (row.month === e) && (row.year === +year) )
-        setUserRows(data2.filter(row => (row.month === e) && (row.year === +year) ))
+        setUserRows(filteredRows.concat(totalRow))
         // setLoading(false)
         // setUserRows(data2.filter(row => ((row.month === e) && (row.year === +year)) || (row.month === e)))
         // console.log(data.filter(row => row.month === month))
@@ -412,7 +491,7 @@ const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, 
 
                 <PrintPayslip componentRef={componentRef} single={single} />
             </div>
-
+            <div  style={{ height: 540, width: '100%' }}>
             <DataGrid
             sx={{
                 "& .MuiDataGrid-main": {
@@ -426,7 +505,7 @@ const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, 
                 //     height: '260px !important',
                 //     overflowY: 'auto',
                 //   },
-                  '& .MuiDataGrid-cell:nth-child(1)': {
+                  '& .MuiDataGrid-cell:nth-child(2)': {
                     position:"sticky",
                     left:"0",
                     zIndex:"1",
@@ -455,7 +534,7 @@ const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, 
                 rowsPerPageOptions={[8]}
                 // checkboxSelection
                 onCellEditCommit={onCellEditCommit}
-                autoHeight 
+                // autoHeight 
                 columnVisibilityModel={columnVisible} 
                 // showCellRightBorder={true}  
                 // slots={{
@@ -465,7 +544,7 @@ const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, 
                 initialState={{
                     pinnedColumns: { left: ['id', 'name'] },
                     sorting: {
-                        sortModel: [{ field: 'employee_name', sort: 'asc' }],
+                        sortModel: [{ field: 'employee_id', sort: 'asc' }],
                       },
                     // columns: {
                     //     columnVisibilityModel: {
@@ -480,11 +559,12 @@ const DatatablePayroll = ({ listName, listPath, columns, userRows, setUserRows, 
                     // },
                 }}          
                 />
+            </div>
         </div>
     )
 }
 
-export default DatatablePayroll;
+export default DatatableOutputPayroll;
 
 
 const columnsExcel = [

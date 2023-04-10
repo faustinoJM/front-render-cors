@@ -1,16 +1,14 @@
-import "./list.scss"
+import "./listOutputPayroll.scss"
 import Sidebar from "../../components/sidebar/Sidebar"
 import Navbar from "../../components/navbar/Navbar"
-import Datatable from "../../components/datatable/Datatable"
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
 import api from "../../services/api"
-import DatatablePayroll from "../../components/datatable/DatatablePayroll"
+import DatatableOutputPayroll from "../../components/datatable/DatatableOutputPayroll"
 
 const payrollColumns = [
     { field: 'employee_id', headerName: 'ID', width: 70, pinnable: true, headerAlign: 'center',},
     { field: 'employee_name', headerName: 'Nome', width: 200, headerAlign: 'center',},
-    { field: "departament_name", headerName:"Departemento", width: 150,  align:'center', headerAlign: 'center', },
+    { field: "departament_name", headerName:"Departamento", width: 150,  align:'center', headerAlign: 'center', },
     { field: "position_name", headerName:"Cargo", width: 150,  align:'center', headerAlign: 'center', },
     { field: "salary_base", headerName: "Salario Base", width: 130, align:'center', headerAlign: 'center',},
     { field: "subsidy",  headerName: "Subsidio", width: 130,  align:'center', headerAlign: 'center',},
@@ -30,7 +28,7 @@ const payrollColumns = [
 ]
 
 export const outputColumnVisible= {
-    employee_id: false,
+    employee_id: true,
     total_overtime: true,
     total_absences: true,
     cash_advances: true,
@@ -39,7 +37,7 @@ export const outputColumnVisible= {
     backpay: true
   };
   
-const ListPayroll = ({ listName, listPath }) => {
+const ListOutputPayroll = ({ listName, listPath }) => {
     const [userRows, setUserRows] = useState([]);
     const [settings, setSettings] = useState({});
 
@@ -93,7 +91,29 @@ const ListPayroll = ({ listName, listPath }) => {
              console.log(listPath)
              console.log(response.data)
              console.log(response.data.data)
-             response.data.map((data) => {
+
+            let totalLiquid = 0
+            let totalBase = 0
+            let totalIrps = 0
+            let totalGross = 0
+            let totalInss = 0
+            let totalInssCompany = 0
+            let totalInssEmployee = 0
+            let totalLength = 0
+
+            totalLength = response.data.map((data, index) => {
+                totalLiquid += (+data.salary_liquid)
+                totalBase += (+data.salary_base)
+                totalGross += (+data.total_income)
+                totalIrps += (+data.irps)
+                totalInss += (+data.inss_company) + (+data.inss_employee)
+                totalInssCompany += (+data.inss_company)
+                totalInssEmployee += (+data.inss_employee)
+                console.log(data.created_at <= new Date())
+             })
+
+             response.data.map((data, index) => {
+                data.employee_id = index + 1
                 data.salary_base = formatSalary().format(data.salary_base)
                 data.salary_liquid = formatSalary().format(data.salary_liquid)
                 data.total_income = formatSalary().format(data.total_income)
@@ -110,7 +130,29 @@ const ListPayroll = ({ listName, listPath }) => {
                 data.base_hour = formatSalary().format(data.base_hour)
                 data.total_inss = formatSalary().format(data.total_inss)
             })
-            setUserRows(response.data)
+            const totalRow = [
+                {
+                id: "totalId",
+                employee_id: totalLength.length + 1,
+                employee_name: "Total",
+                departament_name: "", 
+                position_name: "", 
+                salary_base: formatSalary().format(totalBase), 
+                subsidy: "", 
+                bonus: "", 
+                total_overtime: "", 
+                total_absences: "", 
+                cash_advances: "", 
+                backpay: "", 
+                total_income: formatSalary().format(totalGross), 
+                irps: formatSalary().format(totalIrps), 
+                inss_employee: formatSalary().format(totalInssEmployee), 
+                salary_liquid: formatSalary().format(totalLiquid), 
+                inss_company: formatSalary().format(totalInssCompany), 
+                total_inss: formatSalary().format(totalInss), 
+            }
+        ]
+            setUserRows(response.data.concat(totalRow))
             console.log("1")
         }
         fetchData()
@@ -123,7 +165,7 @@ const ListPayroll = ({ listName, listPath }) => {
             <Sidebar />
             <div className="listContainer">
                 <Navbar />
-                <DatatablePayroll listName={listName} listPath={listPath} columns={payrollColumns} userRows={userRows} setUserRows={setUserRows} settings={settings} outputColumnVisible={outputColumnVisible}/>
+                <DatatableOutputPayroll listName={listName} listPath={listPath} columns={payrollColumns} userRows={userRows} setUserRows={setUserRows} settings={settings} outputColumnVisible={outputColumnVisible}/>
             </div>
         </div>
     )
@@ -133,4 +175,5 @@ function formatSalary() {
     return new Intl.NumberFormat("de-DE",{maximumFractionDigits: 2, minimumFractionDigits: 2})
   }
 
-export default ListPayroll
+export default ListOutputPayroll
+
