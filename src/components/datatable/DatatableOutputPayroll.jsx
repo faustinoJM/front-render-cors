@@ -1,6 +1,6 @@
 import "./datatableOutputPayroll.scss";
 import { DataGrid,} from '@mui/x-data-grid';
-import { Link } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { useCallback, useEffect, useRef, useState } from "react";
 import api from "../../services/api";
 import { useReactToPrint } from "react-to-print";
@@ -11,28 +11,29 @@ import PrintIcon from '@mui/icons-material/Print';
 
 const formatSalary = () => {
     return new Intl.NumberFormat("en-US",{maximumFractionDigits: 2, minimumFractionDigits: 2})
-  }
+}
+
 const formatDate = new Intl.DateTimeFormat("pt-br", { dateStyle: 'short'})  
 
 const payrollDate = formatDate.format(new Date())
 
-const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUserRows, settings, outputColumnVisible }) => {
+const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUserRows, settings, outputColumnVisible, year2, month2, setMonth2, setYear2 }) => {
     const workbook = new exceljs.Workbook();
-    const [maumau, setmaumau] = useState([])
     const [data2, setData2] = useState(userRows);
     const [columnVisible, setColumnVisible] = useState(outputColumnVisible);
-    const [columnsVisible, setColumnsVisible] = useState(payrollColumns);
     const [year, setYear] = useState(0);
     const [month, setMonth] = useState("");
     const componentRef = useRef();
     const [single, setSingle] = useState({});
     const [yearOptions, setYearOptions] = useState([])
-    const [data3, setData3] = useState([])
     const [excelPayroll, setExcelPayroll] = useState([])
     const [loading, setLoading] = useState(true)
+    const params = useParams()
+
+    console.log("187",params.payrollId)
     
     useEffect(() => {
-        console.log("2", settings)
+        // console.log("2", settings)
          if((Object.keys(settings).length) > 0)
           setColumnVisible(outputColumnVisible)
        
@@ -43,11 +44,11 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
         async function fetchData() {
             const response = await api.get("payrolls")
             if (response.data){
-            setExcelPayroll(response.data)
-            console.log(response.data)
+              // setExcelPayroll(response.data)
+            // console.log(response.data)
             if (month && year)
-            setExcelPayroll(item => item.filter(row => (row.year === +year) && (row.month === month)))
-        }
+            setExcelPayroll(() => response.data.filter(row => (row.year === +year) && (row.month === month)))
+          }
         }
             fetchData()
         }, [year, month])
@@ -57,7 +58,7 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
             let years = 0;
             const yearsArray = []
             const response = await api.get("payrolls")
-            console.log("128",response.data)
+            // console.log("128", response.data)
             // setmaumau(response.data)
 
             response.data.map(data => {
@@ -68,6 +69,7 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
             // console.log(yearsArray)
             setYearOptions(yearsArray)
             setData2(response.data)
+
             // console.log(response.data)
             
             // if (response.data)
@@ -75,7 +77,7 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
             // console.log(month)
         }
             fetchData()
-        }, [year, month])
+        }, [])
 
     useEffect(() => {
         async function fetchData() {
@@ -94,8 +96,26 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
           setTimeout(() => {
             setLoading(false)
           }, 5000)
+          
 
         }, [userRows])
+
+        useEffect(() => {
+          // setLoading(true)
+          setUserRows(() => userRows.filter(row => (row.year === year2) && (row.month === month2)))
+          setYear(year2)
+          setMonth(month2)
+
+          if (params.payrollId) {
+            const year = params.payrollId.split("-")[1]
+            const monht = params.payrollId.split("-")[0]
+            setUserRows(() => data2.filter(row => (row.year === +year) && (row.month === month)))
+
+            setYear(+year)
+            setMonth(monht)
+          }
+          }, [year2, month2])
+          
 
     const submitByYear = async (e) => {
         setYear(e)
@@ -119,6 +139,7 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
                 totalInss += (+data.inss_company) + (+data.inss_employee)
                 totalInssCompany += (+data.inss_company)
                 totalInssEmployee += (+data.inss_employee)
+                // console.log(data.created_at.getTime() > (new Date()).getTime()
              })
 
              const totalRow = [
@@ -160,7 +181,7 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
             data.inss_company = formatSalary().format(data.inss_company)
             data.total_inss = formatSalary().format(data.total_inss)
         })
-        console.log(data3.filter(row => (row.year === "2023")))
+        // console.log(data3.filter(row => (row.year === "2023")))
         setUserRows(filteredRows.concat(totalRow))
         // setLoading(false)
         // setUserRows(data2.filter(row => ((row.year === +e) && (row.month === month)) || (row.year === +e)))
@@ -215,7 +236,7 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
               salary_liquid: formatSalary().format(totalLiquid), 
               inss_company: formatSalary().format(totalInssCompany), 
               total_inss: formatSalary().format(totalInss), 
-          }
+            }
       ]
 
       filteredRows.map((data, index) => {
@@ -243,8 +264,8 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
     }
 
     const handleDelete = async (id, router) => {
-    await api.delete(`${router}/${id}`)
-    setUserRows(userRows.filter(item => item.id !== id))
+      await api.delete(`${router}/${id}`)
+      setUserRows(userRows.filter(item => item.id !== id))
     } 
 
     const onCellEditCommit = ({ id, field, value }) => {
@@ -274,11 +295,11 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
         api.get(`payrolls/${id}`)
          .then(response => {setSingle(response.data)})
     
-        console.log(single)
+        // console.log(single)
         
       }
 
-    const exportFile = useCallback(async () => {
+    const exportExcelFile = useCallback(async () => {
         const workSheetName = 'Worksheet-1';
         const workBookName = 'Elint-Systems-Payroll';
         try {
@@ -303,7 +324,7 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
         //   excelPayroll.forEach(singleData => {
         //     worksheet.addRow(singleData);
         //   });
-          console.log(excelPayroll)
+          // console.log(excelPayroll)
            //add row 
             let salary_liquid = 0
             let salary_base = 0 
@@ -447,12 +468,12 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
             {/* {console.log("encima")} */}
             {listName}
             <div className="datatableTitle">
-                <div className="link" onClick={exportFile}>
+                <div className="link" onClick={exportExcelFile}>
                     Exportar Excel
                 </div>
                 <div className="anoMes">
                     <label>Ano: </label>
-                        <select id="year" name="year" onChange={e => submitByYear(e.target.value)}>
+                        <select id="year" name="year" value={year} onChange={e => submitByYear(e.target.value)}>
                             <option value="">Selecione Ano</option>
                             {yearOptions ? yearOptions.map((data, i) => {
                                 return <option key={i}>{data}</option>
@@ -466,7 +487,7 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
                             <option >2024</option> */}
                         </select>
                     <label>Mes: </label>
-                        <select id="month" name="month" onChange={e => submitByMonth(e.target.value)} >
+                        <select id="month" name="month" value={month} onChange={e => submitByMonth(e.target.value)} >
                             <option value="">Selecione Mes</option>
                             <option >Janeiro</option>
                             <option >Fevereiro</option>
@@ -494,6 +515,8 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
             <div  style={{ height: 540, width: '100%' }}>
             <DataGrid
             sx={{
+              fontFamily:"Plus Jakarta Sans, sans-serif", color:'black',
+
                 "& .MuiDataGrid-main": {
                     // remove overflow hidden overwise sticky does not work
                     overflow: "unset"
@@ -527,7 +550,7 @@ const DatatableOutputPayroll = ({ listName, listPath, columns, userRows, setUser
                     },
                     
              }}
-                 columnBuffer={columns.length}
+                columnBuffer={columns.length}
                 rows={userRows}
                 columns={columns.concat(actionColumn)}
                 pageSize={8}
@@ -578,7 +601,7 @@ const columnsExcel = [
     {header: "Mes", key: "month", width: 25},
     {header: "Ano", key: "year", width: 25},
     // {header: "NIB", key: "nib", width: 25, type: "text"},
-    {header: "Num. Seg. INSS", key: "social_security", width: 25},
+    // {header: "Num. Seg. INSS", key: "social_security", width: 25},
     {header: "Salario Base", key: "salary_base", width: 25},
     {header: "Subsidio", key: "subsidy", width: 25},
     {header: "Salario Bruto", key: "total_income", width: 25},
