@@ -1,7 +1,8 @@
 import "./datatableListPayrolls.scss";
 import { DataGrid} from '@mui/x-data-grid';
 import { Link } from "react-router-dom"
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
 import exceljs from 'exceljs';
 import { saveAs } from 'file-saver';
 import api from "../../services/api";
@@ -9,6 +10,8 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PrintIcon from '@mui/icons-material/Print';
 import DescriptionIcon from '@mui/icons-material/Description';
+import PrintPayroll from "../printPayroll/PrintPayroll";
+import { clientPDF } from "../printPayroll/PrintPayroll";
 
 const formatSalary = () => {
     return new Intl.NumberFormat("en-US",{maximumFractionDigits: 2, minimumFractionDigits: 2})
@@ -23,6 +26,9 @@ const DatatableListInput = ({ listName, listPath, columns, userRows, setUserRows
     const [rows, setRows] = useState([]);
     const [excelPayroll, setExcelPayroll] = useState([])
     const [year, setYear] = useState(0);
+    const componentRef = useRef();
+    const [printPayroll, setPrintPayroll] = useState({});
+
 
     useEffect(() => {
         async function fetchData() {
@@ -34,6 +40,28 @@ const DatatableListInput = ({ listName, listPath, columns, userRows, setUserRows
             fetchData()
         }, [])
 
+    useEffect(() => {
+        async function fetchData() {
+            console.log(printPayroll)
+            if(!(Object.keys(printPayroll).length === 0))
+                handlePrint()
+        }
+            fetchData()
+        }, [printPayroll])
+
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+        documentTitle: 'emp-data',
+        // onAfterPrint: () => alert('Print sucess')
+    })
+
+    const handleSinglePrint = (year, month) => {
+        console.log(year, month)
+        // const response = await api.get("payrolls")
+        let printData = excelPayroll.filter(data => data.year === year && data.month === month)
+            clientPDF(printData)
+            // setPrintPayroll(printData)
+      }
 
     useEffect(() => {
         async function fetchData() {
@@ -275,7 +303,8 @@ const DatatableListInput = ({ listName, listPath, columns, userRows, setUserRows
                         <div className="editButton" onClick={() => exportExcelFile(params.row.year, params.row.month)}>
                             <DescriptionIcon className="edIcon"/> Exportar
                         </div>
-                        <div className="printButton" onClick={() => "handleSingle(params.row.id)"}>
+                        <div className="printButton" onClick={() => handleSinglePrint(params.row.year, params.row.month)}>
+                        {/* handleSinglePrint(params.row.year, params.row.month) */}
                               <PrintIcon />  Imprimir
                             </div>
                         <div className="deleteButton" onClick={() => handleDelete(params.row.year, params.row.month, listPath)}>
@@ -301,8 +330,8 @@ const DatatableListInput = ({ listName, listPath, columns, userRows, setUserRows
                             <option >2024</option>
                         </select>
                 */}
+                <PrintPayroll componentRef={componentRef} printData={printPayroll}/>
             </div>
-
             <DataGrid
             sx={{
                 fontFamily:"Plus Jakarta Sans, sans-serif", color:'black',

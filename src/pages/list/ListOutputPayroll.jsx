@@ -102,6 +102,12 @@ const ListOutputPayroll = ({ listName, listPath }) => {
             let totalInssCompany = 0
             let totalInssEmployee = 0
             let totalLength = 0
+            let total_cash_advances = 0
+            let total_subsidy = 0
+            let total_bonus = 0
+            let total_backpay = 0
+            let total_total_absences = 0
+            let total_total_overtime = 0
             let monthGreater = 0
             let yearGreater = 0
             let dateAux = new Date("2000/12/31")
@@ -114,6 +120,12 @@ const ListOutputPayroll = ({ listName, listPath }) => {
                 totalInss += (+data.inss_company) + (+data.inss_employee)
                 totalInssCompany += (+data.inss_company)
                 totalInssEmployee += (+data.inss_employee)
+                total_cash_advances += (+data.cash_advances)
+                total_subsidy += (+data.subsidy)
+                total_bonus += (+data.bonus)
+                total_backpay += (+data.backpay)
+                total_total_absences += (+data.total_absences)
+                total_total_overtime += (+data.total_overtime)
                 
                 if (dateAux.getTime() < new Date(data.created_at).getTime()) {
                     monthGreater = data.month
@@ -121,52 +133,50 @@ const ListOutputPayroll = ({ listName, listPath }) => {
                     dateAux = new Date(data.created_at)
                 }
              })
-             setYear2(yearGreater)
-             setMonth2(monthGreater)
+             
              console.log(monthGreater, yearGreater)
 
              response.data.map((data, index) => {
                 data.employee_id = index + 1
-                data.salary_base = formatSalary().format(data.salary_base)
-                data.salary_liquid = formatSalary().format(data.salary_liquid)
-                data.total_income = formatSalary().format(data.total_income)
-                data.irps = formatSalary().format(data.irps)
-                data.inss_employee = formatSalary().format(data.inss_employee)
-                data.inss_company = formatSalary().format(data.inss_company)
-                data.total_overtime = formatSalary().format(data.total_overtime)
-                data.subsidy = formatSalary().format(data.subsidy)
-                data.bonus = formatSalary().format(data.bonus)
-                data.backpay = formatSalary().format(data.backpay)
-                data.total_absences = formatSalary().format(data.total_absences)
-                data.cash_advances = formatSalary().format(data.cash_advances)
-                data.base_day = formatSalary().format(data.base_day)
-                data.base_hour = formatSalary().format(data.base_hour)
-                data.total_inss = formatSalary().format(data.total_inss)
+            data.salary_base = formatSalary().format(data.salary_base)
+            data.salary_liquid = formatSalary().format(data.salary_liquid)
+            data.total_income = formatSalary().format(data.total_income)
+            data.irps = formatSalary().format(data.irps)
+            data.inss_employee = formatSalary().format(data.inss_employee)
+            data.subsidy = formatSalary().format(data.subsidy)
+            data.bonus = formatSalary().format(data.bonus)
+            data.cash_advances = formatSalary().format(data.cash_advances)
+            data.backpay = formatSalary().format(data.backpay)
+            data.total_absences = formatSalary().format(data.total_absences)
+            data.total_overtime = formatSalary().format(data.total_overtime)
+            data.inss_company = formatSalary().format(data.inss_company)
+            data.total_inss = formatSalary().format(data.total_inss)
             })
             const totalRow = [
                 {
-                id: "totalId",
-                employee_id: totalLength.length + 1,
-                employee_name: "Total",
-                departament_name: "", 
-                position_name: "", 
-                salary_base: formatSalary().format(totalBase), 
-                subsidy: "", 
-                bonus: "", 
-                total_overtime: "", 
-                total_absences: "", 
-                cash_advances: "", 
-                backpay: "", 
-                total_income: formatSalary().format(totalGross), 
-                irps: formatSalary().format(totalIrps), 
-                inss_employee: formatSalary().format(totalInssEmployee), 
-                salary_liquid: formatSalary().format(totalLiquid), 
-                inss_company: formatSalary().format(totalInssCompany), 
-                total_inss: formatSalary().format(totalInss), 
-            }
-        ]
+                    id: "totalId",
+                    employee_id: totalLength.length + 1,
+                    employee_name: "Total",
+                    departament_name: "", 
+                    position_name: "", 
+                    salary_base: formatSalary().format(totalBase), 
+                    subsidy: formatSalary().format(total_subsidy), 
+                    bonus: formatSalary().format(total_bonus), 
+                    total_overtime: formatSalary().format(total_total_absences), 
+                    total_absences: formatSalary().format(total_total_overtime), 
+                    cash_advances: formatSalary().format(total_cash_advances), 
+                    backpay: formatSalary().format(total_backpay), 
+                    total_income: formatSalary().format(totalGross), 
+                    irps: formatSalary().format(totalIrps), 
+                    inss_employee: formatSalary().format(totalInssEmployee), 
+                    salary_liquid: formatSalary().format(totalLiquid), 
+                    inss_company: formatSalary().format(totalInssCompany), 
+                    total_inss: formatSalary().format(totalInss), 
+                }
+            ]
             setUserRows(response.data.concat(totalRow))
-            // console.log("1")
+            setYear2(yearGreater)
+             setMonth2(monthGreater)
         }
         fetchData()
       

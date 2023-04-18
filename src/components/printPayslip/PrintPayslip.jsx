@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print";
 import api from "../../services/api";
-import './payslip.scss'
+import './printPayslip.scss'
 
 const formatSalary = () => {
     return new Intl.NumberFormat("de-DE",{maximumFractionDigits: 2, minimumFractionDigits: 2})
