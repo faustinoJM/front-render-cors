@@ -11,8 +11,9 @@ const formatDate = () => {
     return new Intl.DateTimeFormat("pt-br", { dateStyle: 'long'})
   }
 
-export function clientPDF(printData) {
+export function printPDF(printData) {
     console.log(printData)
+    const montYear = printData.length > 0 ? `${printData[0].month}/${printData[0].year}` : ""
     let totalRow = []
     if (printData.length > 0) {
         totalRow = totalPrint(printData)
@@ -29,6 +30,7 @@ export function clientPDF(printData) {
             data.total_inss = formatSalary().format(data.total_inss)
             data.irps = formatSalary().format(data.irps)
             data.cash_advances = formatSalary().format(data.cash_advances)
+            data.syndicate_employee = formatSalary().format(data.syndicate_employee)
             data.salary_liquid = formatSalary().format(data.salary_liquid)
         })
     }
@@ -61,6 +63,7 @@ export function clientPDF(printData) {
             {text: data.total_inss, fontSize: 10, margin: [0, 2, 0, 2]},
             {text: data.irps, fontSize: 10, margin: [0, 2, 0, 2]},
             {text: data.cash_advances, fontSize: 10, margin: [0, 2, 0, 2]},
+            {text: data.syndicate_employee, fontSize: 10, margin: [0, 2, 0, 2]},
             {text: data.salary_liquid, fontSize: 10, margin: [0, 2, 0, 2]},
         ]
     })
@@ -84,8 +87,8 @@ export function clientPDF(printData) {
                         {text: "Remuneracoes", style: "tableHeader", colSpan: 4, alignment: "center"},
                         {},{},{},
                         {text: "Salario Bruto", style: "tableHeader", rowSpan: 2, alignment: "center"},
-                        {text: "Descontos", style: "tableHeader", colSpan: 5, alignment: "center"},
-                        {},{},{},{},
+                        {text: "Descontos", style: "tableHeader", colSpan: 6, alignment: "center"},
+                        {},{},{},{},{},
                         {text: "Salario Liquido", style: "tableHeader", rowSpan: 2, alignment: "center"},
                     ],
                     [
@@ -104,6 +107,7 @@ export function clientPDF(printData) {
                         {text: "Total INSS", style: "tableHeader", alignment: "center"},
                         {text: "IRPS", style: "tableHeader", alignment: "center"},
                         {text: "Adiantamentos", style: "tableHeader", alignment: "center"},
+                        {text: "Sindicato", style: "tableHeader", alignment: "center"},
                         {},
                     ],
                     ...dados,
@@ -190,16 +194,16 @@ export function clientPDF(printData) {
         header: [reportTitle],
         content: [details],
         footer: rodape,
-        patterns: {
-            stripe45d: {
-              boundingBox: [1, 1, 4, 4],
-              xStep: 3,
-              yStep: 3,
-              pattern: "1 w 0 1 m 4 5 l s 2 0 m 5 3 l s",
-            },}
+        info: {
+            title: `Elint-Systems-Payroll PDF ${montYear}`,
+            author: 'elint systems',
+            subject: 'subject of document',
+            keywords: 'keywords for document',
+            },
     }
 
     pdfMake.createPdf(docDefinitions).open()
+    // pdfMake.createPdf(docDefinitions).download('optionalName.pdf');
 
 }
 
@@ -311,6 +315,7 @@ const totalPrint = (printData) => {
     let totalInssEmployee = 0
     let totalLength = 0
     let total_cash_advances = 0
+    let total_syndicate_employee = 0
     let total_subsidy = 0
     let total_bonus = 0
     let total_backpay = 0
@@ -326,6 +331,7 @@ const totalPrint = (printData) => {
         totalInssCompany += (+data.inss_company)
         totalInssEmployee += (+data.inss_employee)
         total_cash_advances += (+data.cash_advances)
+        total_syndicate_employee += (+data.syndicate_employee)
         total_subsidy += (+data.subsidy)
         total_bonus += (+data.bonus)
         total_backpay += (+data.backpay)
@@ -349,6 +355,7 @@ const totalPrint = (printData) => {
         {text: formatSalary().format(totalInss), fontSize: 10, margin: [0, 2, 0, 2]},
         {text: formatSalary().format(totalIrps), fontSize: 10, margin: [0, 2, 0, 2]},
         {text: formatSalary().format(total_cash_advances), fontSize: 10, margin: [0, 2, 0, 2]},
+        {text: formatSalary().format(total_syndicate_employee), fontSize: 10, margin: [0, 2, 0, 2]},
         {text: formatSalary().format(totalLiquid), fontSize: 10, margin: [0, 2, 0, 2]},
     ]]
 
